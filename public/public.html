@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <script>
+        async function displayTodos() {
+            const username = document.getElementById("username").value;
+            if (username === "") {
+                alert("Please enter a username");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/public/${username}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch todos');
+                }
+
+                const data = await response.json();
+                renderTodos(data);
+            } catch (error) {
+                console.error('Error fetching todos:', error);
+                alert('Failed to fetch todos');
+            }
+        }
+
+        function renderTodos(todos) {
+            const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = ''; // Clear previous todos
+
+            todos.forEach(todo => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('border-b', 'border-gray-200', 'py-2', 'p-4', 'flex', 'justify-between', 'items-center', 'hover:bg-gray-100', 'cursor-pointer');
+
+                const todoContent = document.createElement('span');
+                todoContent.textContent = todo.content;
+                todoContent.classList.add('text-black-500', 'hover:text-gray-200');
+
+                const isPublicTag = document.createElement('span');
+
+                listItem.appendChild(todoContent);
+                listItem.appendChild(isPublicTag);
+                todoList.appendChild(listItem);
+            });
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Extract username from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+
+            if (username) {
+                // Auto-load todos for the provided username
+                try {
+                    const response = await fetch(`/public/${username}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch todos');
+                    }
+
+                    const data = await response.json();
+                    const usernameBox = document.getElementById('username');
+                    usernameBox.value = username;
+                    renderTodos(data);
+                } catch (error) {
+                    console.error('Error fetching todos:', error);
+                    alert('Failed to fetch todos');
+                }
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="bg-black text-white p-5">
+          <div>
+            <a class="text-white hover:text-gray-300 text-5xl" href="/">oOo</a>
+          </div>
+          <div class="flex justify-end">
+            <a class="hover:text-gray-300 px-4" href="/app.html">
+              App
+            </a>
+            <a class="hover:text-gray-300 px-4" href="/login.html">
+              Login
+            </a>
+            <a class="hover:text-gray-300 px-4" href="/contact.html">
+              Contact
+            </a>
+            <a class="hover:text-gray-300 px-4" href="/about.html">
+              About
+            </a>
+          </div>
+        </nav>
+      </header>
+      <br>
+    <div class="flex flex-col items-center">
+        <h1 class="text-3xl font-bold mb-4">Public Todo List</h1>
+        <input id="username" type="text" class="px-4 py-2 border rounded mb-4" placeholder="Enter Username">
+        <button onclick="displayTodos()" class="px-4 py-2 bg-black text-white rounded">Load Todos</button>
+    </div>
+
+    <ul id="todo-list" class="max-w-lg mx-auto mt-4"></ul>
+</body>
+
+</html>

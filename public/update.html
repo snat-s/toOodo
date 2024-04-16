@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./output.css" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav class="bg-black text-white p-5 flex justify-between">
+      <div>
+        <a class="text-white hover:text-gray-300 text-5xl" href="/app.html">oOo</a>
+      </div>
+      <div>
+        <a class="hover:text-gray-300 px-4" href="/add.html">Add</a>
+        <a class="hover:text-gray-300 px-4" onclick="logout()">Logout</a>
+      </div>
+    </nav>
+  </header>
+  <br>
+  <main class="flex-grow flex items-center justify-center bg-white p-4 text-center">
+    <div>
+      <form id="signupForm" class="text-center" onsubmit="updateTodo(event)">
+        <h1 class="text-2xl font-bold mb-4">Update current todo</h1>
+        <p id="currentText">Current text: Loading...</p>
+        <label for="isPublic">Public:</label>
+        <input type="checkbox" id="isPublic" name="isPublic" class="mr-2">
+        <input type="text" id="contents" name="contents" placeholder="todo"
+          class="w-full px-4 py-2 mb-4 border rounded">
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Update</button>
+      </form>
+
+      <button onclick="goBack()" class="bg-gray-300 text-black px-4 py-2 rounded mt-4 hover:bg-gray-400">Go
+        Back</button>
+    </div>
+  </main>
+
+  <script>
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    }
+    async function fetchTodo() {
+      const authToken = localStorage.getItem('authToken')
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const todoID = urlParams.get('todoID');
+      if (!authToken) {
+        console.error('Authentication token not found.');
+        return;
+      }
+      fetch(`api/todo/${todoID}`, {
+        headers: {
+          'Authorization': `${authToken}`
+        }
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch todos');
+        }
+        return response.json();
+      }
+      ).then(data => {
+        console.log(data);
+        const text = document.getElementById('currentText');
+        const modifiableText = document.getElementById('contents');
+        const isPublic = document.getElementById('isPublic');
+        isPublic.checked = data.isPublic;
+        modifiableText.value = data.content;
+        text.textContent = `Current text: ${data.content}`;
+      }).catch(error => {
+        console.error('Error fetching todos:', error);
+      }
+      );
+    }
+    fetchTodo();
+
+    async function updateTodo(event) {
+      event.preventDefault();
+
+      const text = document.getElementById('contents').value;
+      const queryString = window.location.search;
+      const isPublic = document.getElementById('isPublic').checked;
+      const urlParams = new URLSearchParams(queryString);
+      const todoID = urlParams.get('todoID');
+
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`/api/todos/${todoID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${authToken}`
+          },
+          body: JSON.stringify({ content: text, isPublic: isPublic })
+        });
+
+        if (response.ok) {
+          window.location.href = '/app.html';
+        } else {
+          const errorMessage = await response.text();
+          alert(`Failed to update: ${errorMessage}`);
+          console.log(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Server Error');
+      }
+    }
+    function goBack() {
+      window.history.back();
+    }
+
+  </script>
+</body>
+
+</html>

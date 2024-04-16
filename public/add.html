@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./output.css" rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav class="bg-black text-white p-5 flex justify-between">
+      <div>
+        <a class="text-white hover:text-gray-300 text-5xl" href="/app.html">oOo</a>
+      </div>
+      <div>
+        <a class="hover:text-gray-300 px-4" href="/todos.html">Add</a>
+        <a class="hover:text-gray-300 px-4" onclick="logout()">Logout</a>
+      </div>
+    </nav>
+  </header>
+  <main
+    class="flex justify-center items-center h-screen flex-grow flex flex-col justify-center items-center bg-white p-4 text-center flex-grow flex items-center justify-center bg-white p-4 text-center">
+    <div>
+      <form id="signupForm" class="text-center" onsubmit="addTodo(event)">
+        <h1 class="text-2xl font-bold mb-4">Add new todo</h1>
+        <input type="text" id="contents" name="contents" placeholder="todo"
+          class="w-full px-4 py-2 mb-4 border rounded">
+        <label for="isPublic" class="mr-2">Public:</label>
+        <input type="checkbox" id="isPublic" name="isPublic" class="mr-2">
+        <!-- <input type="file" name="file" class="w-full px-4 py-2 mb-4 border rounded"> -->
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Add</button>
+      </form>
+
+      <button onclick="goBack()" class="bg-gray-300 text-black px-4 py-2 rounded mt-4 hover:bg-gray-400">Go
+        Back</button>
+    </div>
+  </main>
+
+  <script>
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    }
+    async function addTodo(event) {
+      event.preventDefault();
+
+      const text = document.getElementById('contents').value;
+      const isPublic = document.getElementById('isPublic').checked;
+      console.log(isPublic, text);
+
+      try {
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch('/api/todos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${authToken}`
+          },
+          body: JSON.stringify({ text: text, isPublic: isPublic })
+        });
+
+        if (response.ok) {
+          window.location.href = '/app.html';
+        } else {
+          const errorMessage = await response.text();
+          alert(`Failed to add Todo: ${errorMessage}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Server Error');
+      }
+    }
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+
+</html>

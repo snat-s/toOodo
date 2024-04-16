@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./output.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="flex flex-col min-h-screen">
+    <header>
+      <nav class="bg-black text-white  p-5">
+        <div>
+          <a class="text-white hover:text-gray-300 text-5xl" href="/">oOo</a>
+        </div>
+        <div class="flex justify-end">
+          <a class="hover:text-gray-300 px-4" href="/app.html">
+            App
+          </a>
+          <a class="hover:text-gray-300 px-4" href="/login.html">
+            Login
+          </a>
+          <a class="hover:text-gray-300 px-4" href="/contact.html">
+            Contact
+          </a>
+          <a class="hover:text-gray-300 px-4" href="/about.html">
+            About
+          </a>
+        </div>
+      </nav>
+    </header>
+    <main class="flex-grow flex items-center justify-center bg-white p-4 text-center">
+      <form id="signupForm" class="text-center" onsubmit="contact(event)">
+        <h1 class="text-2xl font-bold mb-4">Contact</h1>
+        <input type="email" id="email" name="email" placeholder="email" class="w-full px-4 py-2 mb-4 border rounded">
+        <input type="text" id="message" name="message" placeholder="write your message here"
+          class="w-full px-4 py-2 mb-4 border rounded">
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send Message</button>
+        <p class="text-sm mt-2">Thanks for letting us know! We will reach you at a later point.</p>
+      </form>
+    </main>
+    <footer class="sticky bottom-0 text-center bg-black text-white p-9">
+      <p>A project by snats.</p>
+    </footer>
+  </div>
+
+  <script>
+    async function contact(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+
+      try {
+        const response = await fetch('/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, message })
+        });
+
+        if (response.ok) {
+          alert('Thanks for letting us know!');
+          window.location.href = '/';
+        } else {
+          const errorMessage = await response.text();
+          alert(`Failed to send message`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Server Error');
+      }
+    }
+  </script>
+
+</body>
+
+</html>

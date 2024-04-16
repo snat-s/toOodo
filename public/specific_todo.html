@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+  </head>
+  <body >
+    <header>
+        <nav class="bg-black text-white p-5 flex justify-between">
+            <div>
+                <a class="text-white hover:text-gray-300 text-5xl" href="/app.html">oOo</a>
+            </div>
+            <div>
+                <a class="hover:text-gray-300 px-4" href="/add.html">Add</a>
+                <a class="hover:text-gray-300 px-4"  onclick="logout()">Logout</a>
+            </div>
+        </nav>
+    </header>
+  <main class="flex justify-center items-center h-screen flex-grow flex flex-col justify-center items-center bg-white p-4 text-center">
+    <div>
+      <h1 class="text-5xl" id="text"></h1>
+      <div class="p-7">
+        <button id="update" class="p-5 bg-black text-white rounded">Update</button>
+        <button id="delete" class="p-5 bg-black text-white rounded">Delete</button>
+      </div>
+      <button onclick="goBack()" class="bg-gray-300 text-black px-4 py-2 rounded mt-4 hover:bg-gray-400">Go Back</button>
+    </div>
+  </main>
+</body>
+
+  <script>
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    }
+    async function fetchTodo() {
+      const authToken = localStorage.getItem('authToken')
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const todoID = urlParams.get('todoID');
+      // console.log(todoID, authToken);
+      if (!authToken) {
+        console.error('Authentication token not found.');
+        return;
+      }
+      fetch(`api/todo/${todoID}`, {
+        headers: {
+          'Authorization': `${authToken}`
+        }
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch todo');
+        }
+        return response.json();
+      }
+      ).then(data => {
+        console.log(data);
+        const h1Element = document.getElementById('text');
+        h1Element.textContent = data.content;
+      }).catch(error => {
+        console.error('Error fetching todos:', error);
+      }
+      );
+    }
+    fetchTodo();
+
+    function update() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const todoID = urlParams.get('todoID');
+      window.location.href = `/update.html?todoID=${todoID}`;
+    }
+    async function deleteTodo() {
+      const authToken = localStorage.getItem('authToken')
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const todoID = urlParams.get('todoID');
+      const { message } = await fetch(`/api/todos/${todoID}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `${authToken}`
+        }
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch todos');
+        }
+        return response.json();
+      });
+      if (message === "Todo deleted successfully") {
+        window.location.href = "/app.html"
+      } else {
+        alert(message);
+      }
+    }
+      function goBack() {
+        window.history.back();
+      }
+
+    document.getElementById('update').addEventListener('click', update);
+    document.getElementById('delete').addEventListener('click', deleteTodo);
+  </script>
+</html>
+
