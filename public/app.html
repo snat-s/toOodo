@@ -71,43 +71,44 @@
             </div>
         </nav>
     </header>
-    <main
-        class="flex justify-center items-center h-screen flex-grow flex flex-col justify-center items-center bg-white p-4 text-center">
+    <div class="min-h-screen flex flex-col">
+        <main class="flex-grow flex flex-col justify-center items-center bg-white p-4 text-center">
+            <div x-data="todoList()" x-init="loadTodos" class="max-w-lg mx-auto">
 
-        <div x-data="todoList()" x-init="loadTodos" class="max-w-lg mx-auto">
+                <h1 class="text-3xl font-bold mb-4 text-center">ToOodo List</h1>
 
-            <h1 class="text-3xl font-bold mb-4 text-center">ToOodo List</h1>
+                <ul>
+                    <template x-for="todo in todos" :key="todo._id">
+                        <!-- Wrap each list item with an anchor tag -->
+                        <a :href="`/specific_todo.html?todoID=${todo._id}`" class="block">
+                            <li
+                                class="border-b border-gray-200 py-2 p-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer">
+                                <span class="text-black-500 hover:text-gray-200" x-text="todo.content"></span>
+                                <div class="flex space-x-2 items-center">
+                                    <span x-show="todo.isPublic"
+                                        class="bg-black text-white px-2 py-1 rounded">Public</span>
+                                </div>
+                            </li>
+                        </a>
+                    </template>
+                </ul>
+                <div class="p-4"></div>
+                <div class="flex justify-center items-center mt-8">
+                    <a href="add.html"
+                        class="text-center p-4 bg-black rounded text-white hover:text-gray-200 hover:bg-gray-600">Add
+                        new
+                        todo</a>
+                </div>
 
-            <ul>
-                <template x-for="todo in todos" :key="todo._id">
-                    <!-- Wrap each list item with an anchor tag -->
-                    <a :href="`/specific_todo.html?todoID=${todo._id}`" class="block">
-                        <li
-                            class="border-b border-gray-200 py-2 p-4 flex justify-between items-center hover:bg-gray-100 cursor-pointer">
-                            <span class="text-black-500 hover:text-gray-200" x-text="todo.content"></span>
-                            <div class="flex space-x-2 items-center">
-                                <span x-show="todo.isPublic" class="bg-black text-white px-2 py-1 rounded">Public</span>
-                            </div>
-                        </li>
-                    </a>
-                </template>
-            </ul>
-            <div class="p-4"></div>
-            <div class="flex justify-center items-center mt-8">
-                <a href="add.html"
-                    class="text-center p-4 bg-black rounded text-white hover:text-gray-200 hover:bg-gray-600">Add new
-                    todo</a>
+                <div class="py-5"></div>
+                <div class="flex justify-center items-center mt-8">
+                    <button @click="copyPublicTodosLink"
+                        class="text-center p-4 bg-black rounded text-white hover:text-gray-200 hover:bg-gray-600">Copy
+                        Public Todo to Clipboard</button>
+                </div>
             </div>
-
-            <div class="py-5"></div>
-            <div class="flex justify-center items-center mt-8">
-                <button @click="copyPublicTodosLink"
-                    class="text-center p-4 bg-black rounded text-white hover:text-gray-200 hover:bg-gray-600">Copy
-                    Public Todo to Clipboard</button>
-            </div>
-        </div>
-    </main>
-
+        </main>
+    </div>
 </body>
 
 </html>

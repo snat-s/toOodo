@@ -49,10 +49,10 @@ const authenticatedRouter = express.Router();
 authenticatedRouter.use(authenticateToken);
 const accessLogStream = fs.createWriteStream(
 	path.join(__dirname, "access.log"),
-	{ flags: "a" }
-  );
-  
-app.use(morgan("combined", {stream: accessLogStream}));
+	{ flags: "a" },
+);
+
+app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.static("public"));
 app.use(express.json());
 
@@ -76,7 +76,10 @@ authenticatedRouter.get("/todos", async (req, res) => {
 app.post("/contact", async (req, res) => {
 	try {
 		const { email, message } = req.body;
-		const result = await dbClient.db("toodo").collection("contact").insertOne({ email: email, message: message });
+		const result = await dbClient
+			.db("toodo")
+			.collection("contact")
+			.insertOne({ email: email, message: message });
 		res.status(201).json(result.acknowledged);
 	} catch (err) {
 		console.error(err);
@@ -91,11 +94,11 @@ app.get("/public/:user", async (req, res) => {
 
 		const user = await dbClient
 			.db("toodo")
-			.collection('users')
+			.collection("users")
 			.findOne({ username });
 
 		if (!user) {
-			return res.status(404).send('User not found');
+			return res.status(404).send("User not found");
 		}
 		const userId = user._id;
 
@@ -120,7 +123,10 @@ authenticatedRouter.post("/todos", async (req, res) => {
 			userId: req.userId,
 			isPublic: isPublic,
 		};
-		const result = await dbClient.db("toodo").collection("todos").insertOne(todo);
+		const result = await dbClient
+			.db("toodo")
+			.collection("todos")
+			.insertOne(todo);
 		res.status(201).json(result.acknowledged);
 	} catch (err) {
 		console.error(err);
@@ -148,7 +154,6 @@ authenticatedRouter.get("/todo/:id", async (req, res) => {
 // Update a specific todo
 authenticatedRouter.put("/todos/:id", async (req, res) => {
 	try {
-
 		// Extract the fields you want to update from req.body
 		const { content, isPublic } = req.body;
 
@@ -238,7 +243,6 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
 	try {
 		const { username, password } = req.body;
-
 
 		// Find the user by username
 		const user = await dbClient
